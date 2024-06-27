@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    #meineWebGLCanvas{border:1px solid blue;}
+          .monitor {
+              display: flex;
+              flex-direction: row;
+              gap: 10px;
+          }
+          .monitor > div {
+              width: 30px;
+          }
+  </style>
+  <title>WebGL Project Version</title>
+<script defer src="/v1/dist/bundle.js"></script></head>
+<body>
+  <h1>WebGL Project Version</h1>
+  <div id="app">
+    <canvas id="meineWebGLCanvas" width="500" height="500"></canvas>
+  
+    <div class="monitor">
+        mouse x: <div class="mouse_x"></div>
+        mouse y: <div class="mouse_y"></div>
+        angle x: <div class="angle_x"></div>
+        angle y: <div class="angle_y"></div>
+    </div>
+
+    <button type="button" class="start_stop_animation"></button>
+   
+  </div> <!-- End <div id="app"> -->
+
+</body>
+</html>
