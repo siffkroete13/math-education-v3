@@ -588,7 +588,6 @@ function _start() {
               animationButton.textContent = 'Stop Animation';
             }
           };
-          console.log('Hi Welt!!!');
           canvas = document.querySelector('#meineWebGLCanvas');
           gl = canvas.getContext('webgl');
           monitor = {};
@@ -597,15 +596,15 @@ function _start() {
           monitor.angle_x = document.getElementsByClassName('angle_x')[0];
           monitor.angle_y = document.getElementsByClassName('angle_y')[0];
           if (gl) {
-            _context.next = 12;
+            _context.next = 11;
             break;
           }
           alert('Unable to initialize WebGL. Your browser or machine may not support it.');
           return _context.abrupt("return");
-        case 12:
-          _context.next = 14;
-          return Promise.all([_ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'), _ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'), new _LoadModel__WEBPACK_IMPORTED_MODULE_6__.LoadModel().loadFromUrl('./models/cube_with_axes.json')]);
-        case 14:
+        case 11:
+          _context.next = 13;
+          return Promise.all([_ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'), _ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'), new _LoadModel__WEBPACK_IMPORTED_MODULE_6__.LoadModel().loadFromUrl('./models/pyramid.json')]);
+        case 13:
           _yield$Promise$all = _context.sent;
           _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 3);
           vShaderCode = _yield$Promise$all2[0];
@@ -637,7 +636,7 @@ function _start() {
           canvas.removeEventListner( "mousemove", this.events.mouse_dragged );
           canvas.removeAllEventHandlers();
           */
-        case 29:
+        case 28:
         case "end":
           return _context.stop();
       }
@@ -4338,7 +4337,7 @@ module.exports = WebGLDebugUtils;
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("b6d497b2edecc6d2d1ab")
+/******/ 		__webpack_require__.h = () => ("eb24a6ea630b97b18552")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/global */

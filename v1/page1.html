@@ -1,20 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    
-  </style>
-  <title>Page 1</title>
-  
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Multiplication</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 10px;
+        }
+        td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: center;
+        }
+        input[type="number"] {
+            width: 50px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Page 1</h1>
-  <div id="app">
-  </div> <!-- End <div id="app"> -->
+  <h1>Matrix Multiplication</h1>
 
-    
+  <div id="app">
+    <div>
+        <h2>Matrix A</h2>
+        <table id="matrixA">
+            <!-- Rows will be added dynamically -->
+        </table>
+    </div>
+    <div>
+        <h2>Matrix B</h2>
+        <table id="matrixB">
+            <!-- Rows will be added dynamically -->
+        </table>
+    </div>
+    <button id="multiply">Multiply</button>
+    <h2>Result</h2>
+    <table id="resultMatrix">
+        <!-- Result will be displayed here -->
+    </table>
+
+  </div>
 </body>
 </html>
