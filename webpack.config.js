@@ -17,9 +17,13 @@ if (!versions.includes(targetVersion)) {
 }
 
 module.exports = {
-  entry: `./${targetVersion}/src/index.js`,
+  entry: {
+    index: `./${targetVersion}/src/index.js`,
+    page1: `./${targetVersion}/src/page1.js`,
+    page2: `./${targetVersion}/src/page2.js`,
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].bundle.js', // Verwendet den Chunk-Namen für die Ausgabe-Datei
     path: path.resolve(__dirname, targetVersion, 'dist'),
     publicPath: `/${targetVersion}/dist/`
   },
@@ -43,6 +47,16 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, targetVersion, 'index.html'),
       filename: 'index.html'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'page1.html',
+      template: `./${targetVersion}/page1.html`,
+      chunks: ['page1']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'page2.html',
+      template: `./${targetVersion}/page2.html`,
+      chunks: ['page2']
     })
   ],
   devServer: {

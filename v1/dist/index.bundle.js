@@ -588,8 +588,6 @@ function _start() {
               animationButton.textContent = 'Stop Animation';
             }
           };
-          // var cube_with_points = GenerateModels.generateCube(8);
-          // GenerateModels.downloadJson(cube_with_points);
           canvas = document.querySelector('#meineWebGLCanvas');
           gl = canvas.getContext('webgl');
           monitor = {};
@@ -651,6 +649,68 @@ function _start() {
     r(f);
   }, 9) : f();
 })(start);
+
+/*
+
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  mode: 'development', // or 'production'
+  entry: {
+    index: './src/index.js',
+    page1: './src/page1.js',
+    page2: './src/page2.js'
+  },
+  output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    clean: true
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: './src/index.html',
+      chunks: ['index']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'page1.html',
+      template: './src/page1.html',
+      chunks: ['page1']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'page2.html',
+      template: './src/page2.html',
+      chunks: ['page2']
+    })
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
+  },
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 9000,
+    open: true
+  },
+  devtool: 'source-map'
+};
+*/
 
 /***/ }),
 
@@ -882,6 +942,47 @@ var MyUtil = function () {
       }
       console.log(row);
     }
+  };
+  Util.prototype.matToLatex = function (m, n, values) {
+    if (m <= 0 || n <= 0 || values.length !== m * n || vector.length !== n) {
+      throw new Error("Invalid matrix or vector dimensions");
+    }
+    var matrixLatex = "\\begin{pmatrix}";
+    for (var i = 0; i < m; i++) {
+      for (var j = 0; j < n; j++) {
+        matrixLatex += values[i * n + j];
+        if (j < n - 1) matrixLatex += " & ";
+      }
+      if (i < m - 1) matrixLatex += " \\\\ ";
+    }
+    matrixLatex += "\\end{pmatrix}";
+    var vectorLatex = "\\begin{pmatrix}";
+    for (var _i = 0; _i < n; _i++) {
+      vectorLatex += vector[_i];
+      if (_i < n - 1) vectorLatex += " \\\\ ";
+    }
+    vectorLatex += "\\end{pmatrix}";
+    var resultLatex = "\\begin{pmatrix}";
+    for (var _i2 = 0; _i2 < m; _i2++) {
+      var resultValue = 0;
+      for (var _j = 0; _j < n; _j++) {
+        resultValue += values[_i2 * n + _j] * vector[_j];
+      }
+      resultLatex += resultValue;
+      if (_i2 < m - 1) resultLatex += " \\\\ ";
+    }
+    resultLatex += "\\end{pmatrix}";
+    var multiplicationSteps = "";
+    for (var _i3 = 0; _i3 < m; _i3++) {
+      var rowCalc = [];
+      for (var _j2 = 0; _j2 < n; _j2++) {
+        rowCalc.push("".concat(values[_i3 * n + _j2], " \\cdot ").concat(vector[_j2]));
+      }
+      multiplicationSteps += rowCalc.join(" + ");
+      if (_i3 < m - 1) multiplicationSteps += " \\\\ ";
+    }
+    var latexOutput = "\n\t\t\\[\n\t\t\\mathbf{M} = ".concat(matrixLatex, ", \\quad\n\t\t\\mathbf{v} = ").concat(vectorLatex, ", \\quad\n\t\t\\mathbf{M} \\mathbf{v} = ").concat(matrixLatex, " ").concat(vectorLatex, " = \\begin{pmatrix} ").concat(multiplicationSteps, " \\end{pmatrix} = ").concat(resultLatex, "\n\t\t\\]\n\t\t");
+    return latexOutput;
   };
   var instance = null;
   return {
@@ -4231,12 +4332,12 @@ module.exports = WebGLDebugUtils;
 /******/ 	
 /******/ 	/* webpack/runtime/get update manifest filename */
 /******/ 	(() => {
-/******/ 		__webpack_require__.hmrF = () => ("main." + __webpack_require__.h() + ".hot-update.json");
+/******/ 		__webpack_require__.hmrF = () => ("index." + __webpack_require__.h() + ".hot-update.json");
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("3df4805e062b733cb70f")
+/******/ 		__webpack_require__.h = () => ("51168342a29cf34248a9")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -4718,7 +4819,7 @@ module.exports = WebGLDebugUtils;
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = __webpack_require__.hmrS_jsonp = __webpack_require__.hmrS_jsonp || {
-/******/ 			"main": 0
+/******/ 			"index": 0
 /******/ 		};
 /******/ 		
 /******/ 		// no chunk on demand loading
@@ -5234,4 +5335,4 @@ module.exports = WebGLDebugUtils;
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=bundle.js.map
+//# sourceMappingURL=index.bundle.js.map
