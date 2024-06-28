@@ -15,7 +15,7 @@ var myUtil = MyUtil.getInstance();
 
 // App start
 async function start() {
-
+  
 	const canvas = document.querySelector('#meineWebGLCanvas');
 	const gl = canvas.getContext('webgl');
 
@@ -35,7 +35,7 @@ async function start() {
 	const [vShaderCode, fShaderCode, modelData]  = await Promise.all([
 		ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'),
 		ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'),
-		new LoadModel().loadFromUrl('./models/cube_with_axes.json')
+		new LoadModel().loadFromUrl('./models/pyramid.json')
 	]);
 
     // console.log('Vertex Shader Code:', vShaderCode);

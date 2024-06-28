@@ -6,7 +6,7 @@ var myUtil = MyUtil.getInstance();
 // App start
 async function start() {
 
-	
+	console.log('Hi Page 1 !!!')
 	
 }
 

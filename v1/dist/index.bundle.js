@@ -588,6 +588,7 @@ function _start() {
               animationButton.textContent = 'Stop Animation';
             }
           };
+          console.log('Hi Welt!!!');
           canvas = document.querySelector('#meineWebGLCanvas');
           gl = canvas.getContext('webgl');
           monitor = {};
@@ -596,15 +597,15 @@ function _start() {
           monitor.angle_x = document.getElementsByClassName('angle_x')[0];
           monitor.angle_y = document.getElementsByClassName('angle_y')[0];
           if (gl) {
-            _context.next = 11;
+            _context.next = 12;
             break;
           }
           alert('Unable to initialize WebGL. Your browser or machine may not support it.');
           return _context.abrupt("return");
-        case 11:
-          _context.next = 13;
+        case 12:
+          _context.next = 14;
           return Promise.all([_ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'), _ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'), new _LoadModel__WEBPACK_IMPORTED_MODULE_6__.LoadModel().loadFromUrl('./models/cube_with_axes.json')]);
-        case 13:
+        case 14:
           _yield$Promise$all = _context.sent;
           _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 3);
           vShaderCode = _yield$Promise$all2[0];
@@ -636,7 +637,7 @@ function _start() {
           canvas.removeEventListner( "mousemove", this.events.mouse_dragged );
           canvas.removeAllEventHandlers();
           */
-        case 28:
+        case 29:
         case "end":
           return _context.stop();
       }
@@ -4337,7 +4338,7 @@ module.exports = WebGLDebugUtils;
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("51168342a29cf34248a9")
+/******/ 		__webpack_require__.h = () => ("b6d497b2edecc6d2d1ab")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
