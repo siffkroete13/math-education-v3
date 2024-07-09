@@ -603,7 +603,9 @@ function _start() {
           return _context.abrupt("return");
         case 11:
           _context.next = 13;
-          return Promise.all([_ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'), _ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'), new _LoadModel__WEBPACK_IMPORTED_MODULE_6__.LoadModel().loadFromUrl('./models/pyramid.json')]);
+          return Promise.all([_ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'), _ShaderUtil__WEBPACK_IMPORTED_MODULE_2__.ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'), new _LoadModel__WEBPACK_IMPORTED_MODULE_6__.LoadModel().loadFromUrl('./models/koord_sys.json')
+          // new LoadModel().loadFromUrl('./models/pyramid.json')
+          ]);
         case 13:
           _yield$Promise$all = _context.sent;
           _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 3);
@@ -4337,7 +4339,7 @@ module.exports = WebGLDebugUtils;
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("eb24a6ea630b97b18552")
+/******/ 		__webpack_require__.h = () => ("debd7f9618829b9dec44")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/global */

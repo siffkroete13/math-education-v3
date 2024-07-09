@@ -33,15 +33,15 @@ async function start() {
 
 	
 	const [vShaderCode, fShaderCode, modelData]  = await Promise.all([
-		ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'),
-		ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'),
-    new LoadModel().loadFromUrl('./models/cube_with_axes.json')
-		// new LoadModel().loadFromUrl('./models/pyramid.json')
+    ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'),
+    ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'),
+    new LoadModel().loadFromUrl('./models/koord_sys.json')
+    // new LoadModel().loadFromUrl('./models/pyramid.json')
 	]);
 
     // console.log('Vertex Shader Code:', vShaderCode);
     
-
+  
 	var scene = new Scene(canvas, gl, modelData, vShaderCode, fShaderCode);
 
 	var controls = ['my_start', 'my_pause'];

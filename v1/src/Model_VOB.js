@@ -78,12 +78,16 @@ function Model_VOB(gl, programInfo, model_data) {
 	}
 
 	this.createVertextColorBuffer = function () {
-		// Ähnlich wie bei Position Buffer, einfach jetzt mit Color Buffer
-		this.color_buffer_id = this.gl.createBuffer();
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.model_data.colors), this.gl.STATIC_DRAW);
-		
-		return this.color_buffer_id;
+		// Falls es nicht gleich wiele Farben gibt wie vertices dann ist im Model nur eine Farbe hinterlegt.
+		// Bin langsam zu faul für jeden vertex ein color zu setzen, machmal nehmen wir einfach eine Farbe und sparen Platz.
+		if (this.model_data.colors.length === this.num_points * this.model_data.num_color) {
+            this.color_buffer_id = this.gl.createBuffer();
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.model_data.colors), this.gl.STATIC_DRAW);
+        } else {
+            this.color_buffer_id = null;
+        }
+        return this.color_buffer_id;
 	}
 
 	this.createVertextPositionBuffer();
@@ -117,15 +121,18 @@ function Model_VOB(gl, programInfo, model_data) {
 		this.gl.vertexAttribPointer(this.programInfo.attribLocations.vertexPosition, this.model_data.num_dim, this.type, this.normalize, this.stride, this.offset);
 		this.gl.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
 		
-		
-		// Vetex Color Buffer
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
-
-		// Assign the buffer object bound to gl.ARRAY_BUFFER to the attribute variable specified by location 
-		this.gl.vertexAttribPointer(this.programInfo.attribLocations.vertexColor, this.model_data.num_color, this.type, this.normalize, this.stride, this.offset);
-		this.gl.enableVertexAttribArray(this.programInfo.attribLocations.vertexColor);
-
-		
+	
+		if (this.color_buffer_id) {
+			// Vetex Color Buffer
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
+			// Assign the buffer object bound to gl.ARRAY_BUFFER to the attribute variable specified by location 
+            this.gl.vertexAttribPointer(this.programInfo.attribLocations.vertexColor, this.model_data.num_color, this.type, this.normalize, this.stride, this.offset);
+            this.gl.enableVertexAttribArray(this.programInfo.attribLocations.vertexColor);
+        } else {
+            const defaultColor = this.model_data.colors; // Hier haben wir für alle vertices einfach eine Farbe genommen. (Spart Platz)
+            this.gl.disableVertexAttribArray(this.programInfo.attribLocations.vertexColor);
+            this.gl.vertexAttrib4fv(this.programInfo.attribLocations.vertexColor, defaultColor);
+        }
 
 		// console.log('this.primitiveType: ', this.primitiveType);
 		// const gl_primitives = gl.TRIANGLE_STRIP

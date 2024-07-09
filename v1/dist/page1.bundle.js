@@ -123,13 +123,18 @@ function _start() {
             }
           };
           multiply_button = document.getElementById('multiply');
+          if (multiply_button) {
+            _context.next = 7;
+            break;
+          }
+          return _context.abrupt("return");
+        case 7:
           matrixSize = 3; // Define size of the matrices (3x3 in this case)
-          multiply_button.addEventListener('click', multiplyMatrices);
-
           // Initialize matrices with inputs
           createMatrix('matrixA');
           createMatrix('matrixB');
-        case 9:
+          multiply_button.addEventListener('click', multiplyMatrices);
+        case 11:
         case "end":
           return _context.stop();
       }
@@ -377,7 +382,7 @@ var MyUtil = function () {
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("eb24a6ea630b97b18552")
+/******/ 		__webpack_require__.h = () => ("debd7f9618829b9dec44")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */

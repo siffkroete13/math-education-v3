@@ -95,7 +95,10 @@ var GenerateModels = (function() {
         URL.revokeObjectURL(url);
         console.log(`Cube data has been saved to ${filename}`);
     };
-    
+
+    GenerateModels.prototype.copy = function(model) {
+        return JSON.parse(JSON.stringify(model));
+    }
 
     return new GenerateModels();
 })();
