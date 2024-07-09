@@ -47,7 +47,7 @@ function Scene(canvas_ct, gl, modelData, vShaderCode, fShaderCode) {
 	this.render = function() {
         var gl = this.gl;
 
-		const fieldOfView = 30 * (Math.PI / 180);
+		const fieldOfView = 20 * (Math.PI / 180);
         const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
         const zNear = 0.3;
         const zFar = 100.0;

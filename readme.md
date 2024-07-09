@@ -1,5 +1,10 @@
 # Math Education V3
 
+In diesem Projekt werden verschiedene Mathe Themen geometrisch dargestellt um sie besser zu verstehen. Z.B. lineare Abbildungen mit Matrix Multiplikation.
+Spannend ist auch webpack.config.js, dort wird das Projekt so erstellt, dass es mehrere Versionen hat (v1, v2...). Man kann sie einzeln erstellen.
+Zusätzlich hat jede Version mehrere pages mit eigenen html Templates und eigenen js files. 
+Das alles wird mit webpack erstellt, man muss nur npm run build:v1 und npm run start:v1 in der console eingeben und fertig!
+
 ## Setup
 
 ### 1. Projekt initialisieren und notwendige Pakete installieren
