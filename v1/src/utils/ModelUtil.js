@@ -1,7 +1,8 @@
-var GenerateModels = (function() {
-    function GenerateModels() {}
+var ModelUtil = (function() {
+    
+    function ModelUtil() {}
 
-    GenerateModels.prototype.interpolate = function(point1, point2, t) {
+    ModelUtil.prototype.interpolate = function(point1, point2, t) {
         return [
             point1[0] + t * (point2[0] - point1[0]),
             point1[1] + t * (point2[1] - point1[1]),
@@ -9,7 +10,7 @@ var GenerateModels = (function() {
         ];
     };
 
-    GenerateModels.prototype.generateCubePoints = function(numPointsPerEdge) {
+    ModelUtil.prototype.generateCubePoints = function(numPointsPerEdge) {
         const vertices = [
             [-1.0, -1.0,  1.0], // Ecke 1
             [ 1.0, -1.0,  1.0], // Ecke 2
@@ -44,7 +45,7 @@ var GenerateModels = (function() {
         return { positions, colors };
     };
 
-    GenerateModels.prototype.generateCube = function(numPointsPerEdge) {
+    ModelUtil.prototype.generateCube = function(numPointsPerEdge) {
         const { positions, colors } = this.generateCubePoints(numPointsPerEdge);
 
         const cube = {
@@ -62,7 +63,7 @@ var GenerateModels = (function() {
         return cube;
     };
 
-    GenerateModels.prototype.formatCube = function(cube) {
+    ModelUtil.prototype.formatCube = function(cube) {
         function formatArray(arr, groupSize) {
             let formattedString = '';
             for (let i = 0; i < arr.length; i += groupSize) {
@@ -78,11 +79,11 @@ var GenerateModels = (function() {
         return `Cube Points:\n\nType: ${cube.cube_points.type}\nPrimitives: ${cube.cube_points.primitives}\nNumber of Vertices: ${cube.cube_points.num_vertices}\nNumber of Dimensions: ${cube.cube_points.num_dim}\nNumber of Colors: ${cube.cube_points.num_color}\n\nPositions:\n${positionsString}\nColors:\n${colorsString}`;
     };
 
-    GenerateModels.prototype.formatCubeAsJson = function(cube) {
+    ModelUtil.prototype.formatCubeAsJson = function(cube) {
         return JSON.stringify(cube, null, 2);
     };
 
-    GenerateModels.prototype.downloadJson = function(cube, filename) {
+    ModelUtil.prototype.downloadJson = function(cube, filename) {
         const jsonString = JSON.stringify(cube, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -96,11 +97,41 @@ var GenerateModels = (function() {
         console.log(`Cube data has been saved to ${filename}`);
     };
 
-    GenerateModels.prototype.copy = function(model) {
-        return JSON.parse(JSON.stringify(model));
-    }
+    ModelUtil.prototype.transform = function(model, transformMatrix) {
+        const transformedModel = self.clone(model); // Tiefe Kopie des Modells
+    
+        const numVertices = model.positions.length / model.num_dim;
+    
+        for (let i = 0; i < numVertices; i++) {
+            const vertex = [
+                model.positions[i * model.num_dim],
+                model.positions[i * model.num_dim + 1],
+                model.positions[i * model.num_dim + 2],
+                1.0 // Homogene Koordinate
+            ];
+    
+            const transformedVertex = self.myUtil.multiplyMatrixAndPoint4d(transformMatrix, vertex);
+    
+            transformedModel.positions[i * model.num_dim] = transformedVertex[0];
+            transformedModel.positions[i * model.num_dim + 1] = transformedVertex[1];
+            transformedModel.positions[i * model.num_dim + 2] = transformedVertex[2];
+        }
+    
+        return transformedModel;
+    };
+    
 
-    return new GenerateModels();
+    var instance = null;
+	
+	return {
+		getInstance: function(myUtil) {
+			if(instance === null) {
+				instance = new Util(myUtil);
+                instance.prototype.myUtil = myUtil;
+			}
+			return instance;
+		}
+	}
 })();
 
-export { GenerateModels };
+export { ModelUtil };

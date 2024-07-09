@@ -188,6 +188,19 @@ var MyUtil = (function() {
 		return latexOutput;
 	}
 
+	// Hilfsfunktion zur Multiplikation einer 4x4-Matrix mit einem 4D-Vektor
+	function multiplyMatrixAndPoint4d(matrix, point) {
+		const result = [0, 0, 0, 0];
+		for (let row = 0; row < 4; row++) {
+			result[row] =
+				matrix[row * 4 + 0] * point[0] +
+				matrix[row * 4 + 1] * point[1] +
+				matrix[row * 4 + 2] * point[2] +
+				matrix[row * 4 + 3] * point[3];
+		}
+		return result;
+	}
+
 	
 	var instance = null;
 	

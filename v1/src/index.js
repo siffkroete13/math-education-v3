@@ -6,12 +6,13 @@ import { Model_VOB } from './Model_VOB';
 import { Events } from './Events';
 import WebGLDebugUtils from 'webgl-debug';
 import { LoadModel } from './LoadModel';
-import { GenerateModels } from './utils/GenerateModels';
+import { ModelUtil } from './utils/ModelUtil';
 
 
 
 
 var myUtil = MyUtil.getInstance();
+var modelUtil = ModelUtil.getInstance(myUtil);
 
 // App start
 async function start() {
@@ -41,7 +42,9 @@ async function start() {
 
     // console.log('Vertex Shader Code:', vShaderCode);
     
-  
+  var secode_koord_sys = modelUtil.clone(modelData.axes);
+  modelData['axes_2'] = secode_koord_sys;
+
 	var scene = new Scene(canvas, gl, modelData, vShaderCode, fShaderCode);
 
 	var controls = ['my_start', 'my_pause'];
