@@ -10,7 +10,7 @@ var Events = (function() {
 
         this.fps = 30;
 
-        this.animationRunning = true;
+        this.animationRunning = false;
         
 
         this.mouse_drag_started = function(event) {

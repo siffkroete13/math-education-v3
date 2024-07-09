@@ -1,7 +1,13 @@
 var ModelUtil = (function() {
     
+    // Private Variablen
+    let _util = null;
+
+    // Konstruktor
     function ModelUtil() {}
 
+   
+    // Statische Funktionen
     ModelUtil.prototype.interpolate = function(point1, point2, t) {
         return [
             point1[0] + t * (point2[0] - point1[0]),
@@ -98,7 +104,8 @@ var ModelUtil = (function() {
     };
 
     ModelUtil.prototype.transform = function(model, transformMatrix) {
-        const transformedModel = self.clone(model); // Tiefe Kopie des Modells
+        
+        const transformedModel = _util.clone(model); // Tiefe Kopie des Modells
     
         const numVertices = model.positions.length / model.num_dim;
     
@@ -110,7 +117,7 @@ var ModelUtil = (function() {
                 1.0 // Homogene Koordinate
             ];
     
-            const transformedVertex = self.myUtil.multiplyMatrixAndPoint4d(transformMatrix, vertex);
+            const transformedVertex = _util.multiplyMatrixAndPoint4d(transformMatrix, vertex);
     
             transformedModel.positions[i * model.num_dim] = transformedVertex[0];
             transformedModel.positions[i * model.num_dim + 1] = transformedVertex[1];
@@ -123,11 +130,12 @@ var ModelUtil = (function() {
 
     var instance = null;
 	
+    // Das ist das Singleton Design Pattern in JavaScript!
 	return {
 		getInstance: function(myUtil) {
 			if(instance === null) {
-				instance = new Util(myUtil);
-                instance.prototype.myUtil = myUtil;
+				instance = new ModelUtil();
+                _util = myUtil;
 			}
 			return instance;
 		}

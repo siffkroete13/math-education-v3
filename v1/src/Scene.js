@@ -14,9 +14,7 @@ function createDebugContext(gl) {
     });
 }
 
-function rad(angle) {
-    return (angle * (Math.PI / 180));
-}
+
 
 var myUtil = MyUtil.getInstance();
 
@@ -60,7 +58,7 @@ function Scene(canvas_ct, gl, modelData, vShaderCode, fShaderCode) {
         projectionMatrix = myUtil.getProjectionMat4(fieldOfView, aspect, zNear, zFar);
 
         // Set the drawing position to the "identity" point, which is the center of the scene.
-        const modelViewMatrix = mat4.create();
+        let modelViewMatrix = mat4.create();
 
         // Now move the drawing position a bit to where we want to start drawing the square.
         mat4.translate(modelViewMatrix,     // destination matrix
@@ -68,8 +66,8 @@ function Scene(canvas_ct, gl, modelData, vShaderCode, fShaderCode) {
                     [0.0, 0.0, -7]);  		// amount to translate
         
        
-        mat4.rotate(modelViewMatrix, modelViewMatrix, rad(this.angle_x), [1, 0, 0]);
-        mat4.rotate(modelViewMatrix, modelViewMatrix, rad(this.angle_y), [0, 1, 0]);
+        mat4.rotate(modelViewMatrix, modelViewMatrix, myUtil.rad(this.angle_x), [1, 0, 0]);
+        mat4.rotate(modelViewMatrix, modelViewMatrix, myUtil.rad(this.angle_y), [0, 1, 0]);
         // mat4.rotate(modelViewMatrix, modelViewMatrix, rad(this.angle_z), [0, 1, 1]);
 
 

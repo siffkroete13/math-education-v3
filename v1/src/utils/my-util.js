@@ -134,62 +134,8 @@ var MyUtil = (function() {
 		}
 	}
 
-	Util.prototype.matToLatex = function(m, n, values) {
-		if (m <= 0 || n <= 0 || values.length !== m * n || vector.length !== n) {
-			throw new Error("Invalid matrix or vector dimensions");
-		}
-	
-		let matrixLatex = "\\begin{pmatrix}";
-		for (let i = 0; i < m; i++) {
-			for (let j = 0; j < n; j++) {
-				matrixLatex += values[i * n + j];
-				if (j < n - 1) matrixLatex += " & ";
-			}
-			if (i < m - 1) matrixLatex += " \\\\ ";
-		}
-		matrixLatex += "\\end{pmatrix}";
-	
-		let vectorLatex = "\\begin{pmatrix}";
-		for (let i = 0; i < n; i++) {
-			vectorLatex += vector[i];
-			if (i < n - 1) vectorLatex += " \\\\ ";
-		}
-		vectorLatex += "\\end{pmatrix}";
-	
-		let resultLatex = "\\begin{pmatrix}";
-		for (let i = 0; i < m; i++) {
-			let resultValue = 0;
-			for (let j = 0; j < n; j++) {
-				resultValue += values[i * n + j] * vector[j];
-			}
-			resultLatex += resultValue;
-			if (i < m - 1) resultLatex += " \\\\ ";
-		}
-		resultLatex += "\\end{pmatrix}";
-	
-		let multiplicationSteps = "";
-		for (let i = 0; i < m; i++) {
-			let rowCalc = [];
-			for (let j = 0; j < n; j++) {
-				rowCalc.push(`${values[i * n + j]} \\cdot ${vector[j]}`);
-			}
-			multiplicationSteps += rowCalc.join(" + ");
-			if (i < m - 1) multiplicationSteps += " \\\\ ";
-		}
-	
-		let latexOutput = `
-		\\[
-		\\mathbf{M} = ${matrixLatex}, \\quad
-		\\mathbf{v} = ${vectorLatex}, \\quad
-		\\mathbf{M} \\mathbf{v} = ${matrixLatex} ${vectorLatex} = \\begin{pmatrix} ${multiplicationSteps} \\end{pmatrix} = ${resultLatex}
-		\\]
-		`;
-	
-		return latexOutput;
-	}
-
 	// Hilfsfunktion zur Multiplikation einer 4x4-Matrix mit einem 4D-Vektor
-	function multiplyMatrixAndPoint4d(matrix, point) {
+	Util.prototype.multiplyMatrixAndPoint4d = function (matrix, point) {
 		const result = [0, 0, 0, 0];
 		for (let row = 0; row < 4; row++) {
 			result[row] =
@@ -201,6 +147,13 @@ var MyUtil = (function() {
 		return result;
 	}
 
+	Util.prototype.clone = function(model) {
+		return JSON.parse(JSON.stringify(model));
+	};
+	
+	Util.prototype.rad = function(angle) {
+		return (angle * (Math.PI / 180));
+	}
 	
 	var instance = null;
 	

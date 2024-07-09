@@ -254,46 +254,17 @@ var MyUtil = function () {
       console.log(row);
     }
   };
-  Util.prototype.matToLatex = function (m, n, values) {
-    if (m <= 0 || n <= 0 || values.length !== m * n || vector.length !== n) {
-      throw new Error("Invalid matrix or vector dimensions");
+
+  // Hilfsfunktion zur Multiplikation einer 4x4-Matrix mit einem 4D-Vektor
+  Util.prototype.multiplyMatrixAndPoint4d = function (matrix, point) {
+    var result = [0, 0, 0, 0];
+    for (var row = 0; row < 4; row++) {
+      result[row] = matrix[row * 4 + 0] * point[0] + matrix[row * 4 + 1] * point[1] + matrix[row * 4 + 2] * point[2] + matrix[row * 4 + 3] * point[3];
     }
-    var matrixLatex = "\\begin{pmatrix}";
-    for (var i = 0; i < m; i++) {
-      for (var j = 0; j < n; j++) {
-        matrixLatex += values[i * n + j];
-        if (j < n - 1) matrixLatex += " & ";
-      }
-      if (i < m - 1) matrixLatex += " \\\\ ";
-    }
-    matrixLatex += "\\end{pmatrix}";
-    var vectorLatex = "\\begin{pmatrix}";
-    for (var _i = 0; _i < n; _i++) {
-      vectorLatex += vector[_i];
-      if (_i < n - 1) vectorLatex += " \\\\ ";
-    }
-    vectorLatex += "\\end{pmatrix}";
-    var resultLatex = "\\begin{pmatrix}";
-    for (var _i2 = 0; _i2 < m; _i2++) {
-      var resultValue = 0;
-      for (var _j = 0; _j < n; _j++) {
-        resultValue += values[_i2 * n + _j] * vector[_j];
-      }
-      resultLatex += resultValue;
-      if (_i2 < m - 1) resultLatex += " \\\\ ";
-    }
-    resultLatex += "\\end{pmatrix}";
-    var multiplicationSteps = "";
-    for (var _i3 = 0; _i3 < m; _i3++) {
-      var rowCalc = [];
-      for (var _j2 = 0; _j2 < n; _j2++) {
-        rowCalc.push("".concat(values[_i3 * n + _j2], " \\cdot ").concat(vector[_j2]));
-      }
-      multiplicationSteps += rowCalc.join(" + ");
-      if (_i3 < m - 1) multiplicationSteps += " \\\\ ";
-    }
-    var latexOutput = "\n\t\t\\[\n\t\t\\mathbf{M} = ".concat(matrixLatex, ", \\quad\n\t\t\\mathbf{v} = ").concat(vectorLatex, ", \\quad\n\t\t\\mathbf{M} \\mathbf{v} = ").concat(matrixLatex, " ").concat(vectorLatex, " = \\begin{pmatrix} ").concat(multiplicationSteps, " \\end{pmatrix} = ").concat(resultLatex, "\n\t\t\\]\n\t\t");
-    return latexOutput;
+    return result;
+  };
+  Util.prototype.clone = function (model) {
+    return JSON.parse(JSON.stringify(model));
   };
   var instance = null;
   return {
@@ -382,7 +353,7 @@ var MyUtil = function () {
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("debd7f9618829b9dec44")
+/******/ 		__webpack_require__.h = () => ("94692b4c0ee334666ae8")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */

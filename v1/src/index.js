@@ -11,8 +11,8 @@ import { ModelUtil } from './utils/ModelUtil';
 
 
 
-var myUtil = MyUtil.getInstance();
-var modelUtil = ModelUtil.getInstance(myUtil);
+let myUtil = MyUtil.getInstance();
+let modelUtil = ModelUtil.getInstance(myUtil);
 
 // App start
 async function start() {
@@ -33,7 +33,7 @@ async function start() {
 	}
 
 	
-	const [vShaderCode, fShaderCode, modelData]  = await Promise.all([
+	let [vShaderCode, fShaderCode, modelData]  = await Promise.all([
     ShaderUtil.loadShaderSource('./shaders/vShaderCode.glsl'),
     ShaderUtil.loadShaderSource('./shaders/fShaderCode.glsl'),
     new LoadModel().loadFromUrl('./models/koord_sys.json')
@@ -42,14 +42,29 @@ async function start() {
 
     // console.log('Vertex Shader Code:', vShaderCode);
     
-  var secode_koord_sys = modelUtil.clone(modelData.axes);
-  modelData['axes_2'] = secode_koord_sys;
+  let mdelData2 = myUtil.clone(modelData);
+  let rotationMatrix = mat4.create();
+  
+  mat4.rotate(rotationMatrix, rotationMatrix, myUtil.rad(45), [0, 0, 1]);
 
-	var scene = new Scene(canvas, gl, modelData, vShaderCode, fShaderCode);
+  // Ein zweites Koordinatensystem erstellen. Zuerst vom ersten kopieren, dann transformieren und beide schlussendlich zeichnen.
+  let axes_2 = modelData.axes;
+  let ticks_2 = modelData.ticks;
 
-	var controls = ['my_start', 'my_pause'];
+  // Achsen etwas transformieren
+  axes_2 = modelUtil.transform(modelData.axes, rotationMatrix);
+  ticks_2 = modelUtil.transform(modelData.ticks, rotationMatrix);
 
-	var events = new Events(scene, controls);
+  
+  modelData['axes_2'] = axes_2;
+  modelData['ticks_2'] = ticks_2;
+
+
+	let scene = new Scene(canvas, gl, modelData, vShaderCode, fShaderCode);
+
+	let controls = ['my_start', 'my_pause'];
+
+	let events = new Events(scene, controls);
 	
 	canvas.addEventListener('mousedown', events.mouse_drag_started.bind(events));
 	canvas.addEventListener('mouseup', events.mouse_drag_ended.bind(events));
@@ -74,12 +89,16 @@ async function start() {
 			animationButton.textContent = 'Stop Animation';
 		}
 	}
+
 	
 	animationButton.addEventListener('click', function() {
 		start_stop_animation();
 	});
 
-	animationButton.click();
+
+  scene.render();
+
+	// animationButton.click();
 
 	
 	/*
@@ -102,65 +121,3 @@ async function start() {
     /in/.test(document.readyState) ? setTimeout(function() { r(f);}, 9) : f()
 })(start);
 	    
-
-/*
-
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-module.exports = {
-  mode: 'development', // or 'production'
-  entry: {
-    index: './src/index.js',
-    page1: './src/page1.js',
-    page2: './src/page2.js'
-  },
-  output: {
-    filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
-    clean: true
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: './src/index.html',
-      chunks: ['index']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'page1.html',
-      template: './src/page1.html',
-      chunks: ['page1']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'page2.html',
-      template: './src/page2.html',
-      chunks: ['page2']
-    })
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
-  },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    compress: true,
-    port: 9000,
-    open: true
-  },
-  devtool: 'source-map'
-};
-*/

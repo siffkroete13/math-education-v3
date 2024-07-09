@@ -235,10 +235,15 @@ function Model_VOB(gl, programInfo, model_data) {
     return this.vertex_buffer_id;
   };
   this.createVertextColorBuffer = function () {
-    // Ähnlich wie bei Position Buffer, einfach jetzt mit Color Buffer
-    this.color_buffer_id = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.model_data.colors), this.gl.STATIC_DRAW);
+    // Falls es nicht gleich wiele Farben gibt wie vertices dann ist im Model nur eine Farbe hinterlegt.
+    // Bin langsam zu faul für jeden vertex ein color zu setzen, machmal nehmen wir einfach eine Farbe und sparen Platz.
+    if (this.model_data.colors.length === this.num_points * this.model_data.num_color) {
+      this.color_buffer_id = this.gl.createBuffer();
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.model_data.colors), this.gl.STATIC_DRAW);
+    } else {
+      this.color_buffer_id = null;
+    }
     return this.color_buffer_id;
   };
   this.createVertextPositionBuffer();
@@ -266,13 +271,17 @@ function Model_VOB(gl, programInfo, model_data) {
     // Assign the buffer object bound to gl.ARRAY_BUFFER to the attribute variable specified by location 
     this.gl.vertexAttribPointer(this.programInfo.attribLocations.vertexPosition, this.model_data.num_dim, this.type, this.normalize, this.stride, this.offset);
     this.gl.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
-
-    // Vetex Color Buffer
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
-
-    // Assign the buffer object bound to gl.ARRAY_BUFFER to the attribute variable specified by location 
-    this.gl.vertexAttribPointer(this.programInfo.attribLocations.vertexColor, this.model_data.num_color, this.type, this.normalize, this.stride, this.offset);
-    this.gl.enableVertexAttribArray(this.programInfo.attribLocations.vertexColor);
+    if (this.color_buffer_id) {
+      // Vetex Color Buffer
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.color_buffer_id);
+      // Assign the buffer object bound to gl.ARRAY_BUFFER to the attribute variable specified by location 
+      this.gl.vertexAttribPointer(this.programInfo.attribLocations.vertexColor, this.model_data.num_color, this.type, this.normalize, this.stride, this.offset);
+      this.gl.enableVertexAttribArray(this.programInfo.attribLocations.vertexColor);
+    } else {
+      var defaultColor = this.model_data.colors; // Hier haben wir für alle vertices einfach eine Farbe genommen. (Spart Platz)
+      this.gl.disableVertexAttribArray(this.programInfo.attribLocations.vertexColor);
+      this.gl.vertexAttrib4fv(this.programInfo.attribLocations.vertexColor, defaultColor);
+    }
 
     // console.log('this.primitiveType: ', this.primitiveType);
     // const gl_primitives = gl.TRIANGLE_STRIP
@@ -547,7 +556,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webgl_debug__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! webgl-debug */ "./node_modules/webgl-debug/index.js");
 /* harmony import */ var webgl_debug__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(webgl_debug__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _LoadModel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./LoadModel */ "./v1/src/LoadModel.js");
-/* harmony import */ var _utils_GenerateModels__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/GenerateModels */ "./v1/src/utils/GenerateModels.js");
+/* harmony import */ var _utils_ModelUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/ModelUtil */ "./v1/src/utils/ModelUtil.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
@@ -568,6 +577,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 
 var myUtil = _utils_my_util__WEBPACK_IMPORTED_MODULE_0__.MyUtil.getInstance();
+var modelUtil = _utils_ModelUtil__WEBPACK_IMPORTED_MODULE_7__.ModelUtil.getInstance(myUtil);
 
 // App start
 function start() {
@@ -575,7 +585,7 @@ function start() {
 } // Ein kleiner Hack damit die Start-Funktion erst aufgerufen wird, nachdem DOM geladen ist.
 function _start() {
   _start = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var canvas, gl, monitor, _yield$Promise$all, _yield$Promise$all2, vShaderCode, fShaderCode, modelData, scene, controls, events, animationButton, start_stop_animation;
+    var canvas, gl, monitor, _yield$Promise$all, _yield$Promise$all2, vShaderCode, fShaderCode, modelData, secode_koord_sys, scene, controls, events, animationButton, start_stop_animation;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -613,6 +623,8 @@ function _start() {
           fShaderCode = _yield$Promise$all2[1];
           modelData = _yield$Promise$all2[2];
           // console.log('Vertex Shader Code:', vShaderCode);
+          secode_koord_sys = myUtil.clone(modelData.axes);
+          modelData['axes_2'] = secode_koord_sys;
           scene = new _Scene__WEBPACK_IMPORTED_MODULE_1__.Scene(canvas, gl, modelData, vShaderCode, fShaderCode);
           controls = ['my_start', 'my_pause'];
           events = new _Events__WEBPACK_IMPORTED_MODULE_4__.Events(scene, controls);
@@ -629,7 +641,9 @@ function _start() {
           animationButton.addEventListener('click', function () {
             start_stop_animation();
           });
-          animationButton.click();
+          scene.render();
+
+          // animationButton.click();
 
           /*
           // Remove all event handlers
@@ -638,7 +652,7 @@ function _start() {
           canvas.removeEventListner( "mousemove", this.events.mouse_dragged );
           canvas.removeAllEventHandlers();
           */
-        case 28:
+        case 30:
         case "end":
           return _context.stop();
       }
@@ -652,80 +666,18 @@ function _start() {
   }, 9) : f();
 })(start);
 
-/*
-
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-module.exports = {
-  mode: 'development', // or 'production'
-  entry: {
-    index: './src/index.js',
-    page1: './src/page1.js',
-    page2: './src/page2.js'
-  },
-  output: {
-    filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
-    clean: true
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: './src/index.html',
-      chunks: ['index']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'page1.html',
-      template: './src/page1.html',
-      chunks: ['page1']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'page2.html',
-      template: './src/page2.html',
-      chunks: ['page2']
-    })
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
-  },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    compress: true,
-    port: 9000,
-    open: true
-  },
-  devtool: 'source-map'
-};
-*/
-
 /***/ }),
 
-/***/ "./v1/src/utils/GenerateModels.js":
-/*!****************************************!*\
-  !*** ./v1/src/utils/GenerateModels.js ***!
-  \****************************************/
+/***/ "./v1/src/utils/ModelUtil.js":
+/*!***********************************!*\
+  !*** ./v1/src/utils/ModelUtil.js ***!
+  \***********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   GenerateModels: () => (/* binding */ GenerateModels)
+/* harmony export */   ModelUtil: () => (/* binding */ ModelUtil)
 /* harmony export */ });
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -737,12 +689,18 @@ function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) 
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-var GenerateModels = function () {
-  function GenerateModels() {}
-  GenerateModels.prototype.interpolate = function (point1, point2, t) {
+var ModelUtil = function () {
+  // Private Variablen
+  var _util = null;
+
+  // Konstruktor
+  function ModelUtil() {}
+
+  // Statische Funktionen
+  ModelUtil.prototype.interpolate = function (point1, point2, t) {
     return [point1[0] + t * (point2[0] - point1[0]), point1[1] + t * (point2[1] - point1[1]), point1[2] + t * (point2[2] - point1[2])];
   };
-  GenerateModels.prototype.generateCubePoints = function (numPointsPerEdge) {
+  ModelUtil.prototype.generateCubePoints = function (numPointsPerEdge) {
     var _this = this;
     var vertices = [[-1.0, -1.0, 1.0],
     // Ecke 1
@@ -786,7 +744,7 @@ var GenerateModels = function () {
       colors: colors
     };
   };
-  GenerateModels.prototype.generateCube = function (numPointsPerEdge) {
+  ModelUtil.prototype.generateCube = function (numPointsPerEdge) {
     var _this$generateCubePoi = this.generateCubePoints(numPointsPerEdge),
       positions = _this$generateCubePoi.positions,
       colors = _this$generateCubePoi.colors;
@@ -803,7 +761,7 @@ var GenerateModels = function () {
     };
     return cube;
   };
-  GenerateModels.prototype.formatCube = function (cube) {
+  ModelUtil.prototype.formatCube = function (cube) {
     function formatArray(arr, groupSize) {
       var formattedString = '';
       for (var i = 0; i < arr.length; i += groupSize) {
@@ -816,10 +774,10 @@ var GenerateModels = function () {
     var colorsString = formatArray(cube.cube_points.colors, 12);
     return "Cube Points:\n\nType: ".concat(cube.cube_points.type, "\nPrimitives: ").concat(cube.cube_points.primitives, "\nNumber of Vertices: ").concat(cube.cube_points.num_vertices, "\nNumber of Dimensions: ").concat(cube.cube_points.num_dim, "\nNumber of Colors: ").concat(cube.cube_points.num_color, "\n\nPositions:\n").concat(positionsString, "\nColors:\n").concat(colorsString);
   };
-  GenerateModels.prototype.formatCubeAsJson = function (cube) {
+  ModelUtil.prototype.formatCubeAsJson = function (cube) {
     return JSON.stringify(cube, null, 2);
   };
-  GenerateModels.prototype.downloadJson = function (cube, filename) {
+  ModelUtil.prototype.downloadJson = function (cube, filename) {
     var jsonString = JSON.stringify(cube, null, 2);
     var blob = new Blob([jsonString], {
       type: 'application/json'
@@ -834,7 +792,32 @@ var GenerateModels = function () {
     URL.revokeObjectURL(url);
     console.log("Cube data has been saved to ".concat(filename));
   };
-  return new GenerateModels();
+  ModelUtil.prototype.transform = function (model, transformMatrix) {
+    var transformedModel = _util.clone(model); // Tiefe Kopie des Modells
+
+    var numVertices = model.positions.length / model.num_dim;
+    for (var i = 0; i < numVertices; i++) {
+      var vertex = [model.positions[i * model.num_dim], model.positions[i * model.num_dim + 1], model.positions[i * model.num_dim + 2], 1.0 // Homogene Koordinate
+      ];
+      var transformedVertex = _util.multiplyMatrixAndPoint4d(transformMatrix, vertex);
+      transformedModel.positions[i * model.num_dim] = transformedVertex[0];
+      transformedModel.positions[i * model.num_dim + 1] = transformedVertex[1];
+      transformedModel.positions[i * model.num_dim + 2] = transformedVertex[2];
+    }
+    return transformedModel;
+  };
+  var instance = null;
+
+  // Das ist das Singleton Design Pattern in JavaScript!
+  return {
+    getInstance: function getInstance(myUtil) {
+      if (instance === null) {
+        instance = new ModelUtil();
+        _util = myUtil;
+      }
+      return instance;
+    }
+  };
 }();
 
 
@@ -945,46 +928,17 @@ var MyUtil = function () {
       console.log(row);
     }
   };
-  Util.prototype.matToLatex = function (m, n, values) {
-    if (m <= 0 || n <= 0 || values.length !== m * n || vector.length !== n) {
-      throw new Error("Invalid matrix or vector dimensions");
+
+  // Hilfsfunktion zur Multiplikation einer 4x4-Matrix mit einem 4D-Vektor
+  Util.prototype.multiplyMatrixAndPoint4d = function (matrix, point) {
+    var result = [0, 0, 0, 0];
+    for (var row = 0; row < 4; row++) {
+      result[row] = matrix[row * 4 + 0] * point[0] + matrix[row * 4 + 1] * point[1] + matrix[row * 4 + 2] * point[2] + matrix[row * 4 + 3] * point[3];
     }
-    var matrixLatex = "\\begin{pmatrix}";
-    for (var i = 0; i < m; i++) {
-      for (var j = 0; j < n; j++) {
-        matrixLatex += values[i * n + j];
-        if (j < n - 1) matrixLatex += " & ";
-      }
-      if (i < m - 1) matrixLatex += " \\\\ ";
-    }
-    matrixLatex += "\\end{pmatrix}";
-    var vectorLatex = "\\begin{pmatrix}";
-    for (var _i = 0; _i < n; _i++) {
-      vectorLatex += vector[_i];
-      if (_i < n - 1) vectorLatex += " \\\\ ";
-    }
-    vectorLatex += "\\end{pmatrix}";
-    var resultLatex = "\\begin{pmatrix}";
-    for (var _i2 = 0; _i2 < m; _i2++) {
-      var resultValue = 0;
-      for (var _j = 0; _j < n; _j++) {
-        resultValue += values[_i2 * n + _j] * vector[_j];
-      }
-      resultLatex += resultValue;
-      if (_i2 < m - 1) resultLatex += " \\\\ ";
-    }
-    resultLatex += "\\end{pmatrix}";
-    var multiplicationSteps = "";
-    for (var _i3 = 0; _i3 < m; _i3++) {
-      var rowCalc = [];
-      for (var _j2 = 0; _j2 < n; _j2++) {
-        rowCalc.push("".concat(values[_i3 * n + _j2], " \\cdot ").concat(vector[_j2]));
-      }
-      multiplicationSteps += rowCalc.join(" + ");
-      if (_i3 < m - 1) multiplicationSteps += " \\\\ ";
-    }
-    var latexOutput = "\n\t\t\\[\n\t\t\\mathbf{M} = ".concat(matrixLatex, ", \\quad\n\t\t\\mathbf{v} = ").concat(vectorLatex, ", \\quad\n\t\t\\mathbf{M} \\mathbf{v} = ").concat(matrixLatex, " ").concat(vectorLatex, " = \\begin{pmatrix} ").concat(multiplicationSteps, " \\end{pmatrix} = ").concat(resultLatex, "\n\t\t\\]\n\t\t");
-    return latexOutput;
+    return result;
+  };
+  Util.prototype.clone = function (model) {
+    return JSON.parse(JSON.stringify(model));
   };
   var instance = null;
   return {
@@ -4339,7 +4293,7 @@ module.exports = WebGLDebugUtils;
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("debd7f9618829b9dec44")
+/******/ 		__webpack_require__.h = () => ("94692b4c0ee334666ae8")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
