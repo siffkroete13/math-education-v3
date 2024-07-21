@@ -3,17 +3,17 @@
 
 var MyUtil = (function() {
 	function Util() {}
-	
+
 	// Dies ist die komplette Projektions-Matrix (Perspective-Projextion-Matrix). Alle Koordinaten der Vertices im Frustum werden richtig
 	// in den Bereich von -1 zu 1 projeziert. Auch die Tatsache, dass aspect ration nicht gleich 1 ist wird beachtet durch diese Matrix.
 	// Auch die z-Koordinaten werden zwischen -1 und 1 projeziert (für allfälliges weg clippen oder so).
 	// Anfangs dachte ich, dass was fehlt, z.B. die Zentrierung von apex (Kamera) oder so. Aber diese Funktion ist nur für für zentrierte Kamera zugelassen.
-	// Dann dachte ich auch, dass ja das Ganze auf ein clipping volume projeziert werden muss (clipping volume: Würfel von -1 zu 1) und dass 
+	// Dann dachte ich auch, dass ja das Ganze auf ein clipping volume projeziert werden muss (clipping volume: Würfel von -1 zu 1) und dass
 	// das dem Aspect Ratio wiederspricht, weil aspect ratio kann auch nicht gleich 1 sein. Aber es wird in den Formeln ebenfalls beachtet wie ich raus fand.
 	Util.prototype.getProjectionMat4 = function(fov, aspect_ratio, zNear, zFar) {
-		
+
 		var angle = fov / 2.0;
-		
+
 		// Vorsicht, die Spalten hier sind die Zeilen der eigentlichen Matrix, keine Ahnung warum das so ist, ist ne wegbl Sache, nicht meine Schuld.
 		var projectionMatrix = [
 			1.0 / (aspect_ratio * Math.tan(angle) ),      	0.0, 						0.0, 									0.0,
@@ -21,45 +21,59 @@ var MyUtil = (function() {
 			0.0, 											0.0, 						-(zNear - zFar) / (zNear - zFar), 		-1.0,
 			0.0, 											0.0, 						(2 * zFar * zNear) / (zNear - zFar), 	0.0
 		];
-	
-		
+
+
 		return projectionMatrix;
 	}
-	
+
 	// Diese Funktion macht geanu das Gleiche wie getProjectionMat4(..) einfach mit anderen Argumenten.
 	// Left und Right müssen gleich lang sein. Und auch top, bottom aber nur hier, im Allgemeinen müsste diese Funktion das auch beachten.
 	// Falls die Kamera nicht im Zentrum steht (d.h. -left != right oder -bottom != top) dann müsste man die Funktion noch fertig schreiben.
 	// In einem solchen Fall müsste man dann noch die Zentrierung der Kamera ausführen (Translate the apex of the frustum to the origin).
-	// Die zentrierung der Kamera to the origin (apex ist die Kamera) kann man sich so vorstellen: Ist as apex nach rechts (x-Achse) verschoben, so schiebe 
+	// Die zentrierung der Kamera to the origin (apex ist die Kamera) kann man sich so vorstellen: Ist as apex nach rechts (x-Achse) verschoben, so schiebe
 	// man das Koordinatensystem auch nach Rechts Richtung der x-Achse so dass der Koordinaten-Ursprung auf das Apex zu liegen kommt. Als Folge verschieben
 	// sich die Koordinaten der einzelnen Vertices nach "Links" der x-Achse nach, also ins Minus. Das Gleiche tue man natürlich für Y-Achse falls nötig.
 	// Das "nach Rechts" könnte natürlich auch "nach Links" sein, das war nur ein Beispiel o.B.d.A. sozusagen.
 	Util.prototype.getProjectionWithLeftRightTopBottomNearFarMat4 = function(left, right, bottom, top, near, far) {
 		var fovy, aspect;
-		
+
 		fovy = 2 * toDegrees(Math.atan2(top, near));
 		if (-left === right && -bottom === top ) {
 			aspect = right / top; // width / height
-		
+
 			return this.createPerspective(fovy, aspect, near, far);
 		}
 	}
-		
-	
+
+
 	Util.prototype.getOrthographicMat4 = function(left, right, bottom, top, zNear, zFar) {
-		
+
 		var orthographiMatrix = [
 			2.0 / (right - left), 0.0, 0.0, 0.0,
 			0.0, 2.0 / (top - bottom), 0.0, 0.0,
 			0.0, 0.0, -2.0 / (zFar - zNear), 0.0,
 			1.0, 1.0, -(zFar+zNear)/(zFar-zNear), 1.0
 		]
-		
+
 		return orthographiMatrix;
 	}
-	
-	Util.prototype.multiply = function(a, b) {
-		
+
+    Util.prototype.multiply4d = function(a, b) {
+        const result = [];
+        for (let i = 0; i < 3; i++) {
+            result[i] = [];
+            for (let j = 0; j < 3; j++) {
+                result[i][j] = 0;
+                for (let k = 0; k < 3; k++) {
+                    result[i][j] += a[i][k] * b[k][j];
+                }
+            }
+        }
+        return result;
+    }
+
+	Util.prototype.multiply4d = function(a, b) {
+
 		var b00 = b[0 * 4 + 0];
 		var b01 = b[0 * 4 + 1];
 		var b02 = b[0 * 4 + 2];
@@ -92,7 +106,7 @@ var MyUtil = (function() {
 		var a31 = a[3 * 4 + 1];
 		var a32 = a[3 * 4 + 2];
 		var a33 = a[3 * 4 + 3];
-	 
+
 		return [
 			b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
 			b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
@@ -111,7 +125,7 @@ var MyUtil = (function() {
 			b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
 			b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
 		];
-	  
+
 	}
 
 	Util.prototype.printMatrix4 = function(matrix, name = '') {
@@ -120,7 +134,7 @@ var MyUtil = (function() {
 			console.error("Invalid matrix length. Expected a 4x4 matrix.");
 			return;
 		}
-	
+
 		const fieldSize = 10; // Size of each field for alignment
 		console.log(name + ":");
 		for (let i = 0; i < 4; i++) {
@@ -150,13 +164,62 @@ var MyUtil = (function() {
 	Util.prototype.clone = function(model) {
 		return JSON.parse(JSON.stringify(model));
 	};
-	
+
+    Util.prototype.inverse2d = function(matrix) {
+        const a = matrix[0][0];
+        const b = matrix[0][1];
+        const c = matrix[1][0];
+        const d = matrix[1][1];
+
+        const det = a * d - b * c;
+
+        if (det === 0) {
+            throw new Error("Matrix is not invertible");
+        }
+
+        const invDet = 1 / det;
+
+        return [
+            [d * invDet, -b * invDet],
+            [-c * invDet, a * invDet]
+        ];
+    }
+
+    // Methode zur Invertierung einer 3x3 Matrix
+    Util.prototype.inverse3d = function(matrix) {
+        // Berechne die Inverse der Matrix (hier ist ein einfaches Beispiel für eine 3x3 Matrix)
+        // Es ist eine vereinfachte Annahme, dass die Matrix eine 3x3 Matrix ist.
+        const m = matrix;
+        const det = m[0] * (m[4] * m[8] - m[7] * m[5]) - m[1] * (m[3] * m[8] - m[5] * m[6]) + m[2] * (m[3] * m[7] - m[4] * m[6]);
+        if (det === 0) return null;
+
+        const invDet = 1 / det;
+
+        return [
+            [
+                (m[4] * m[8] - m[7] * m[5]) * invDet,
+                (m[2] * m[7] - m[1] * m[8]) * invDet,
+                (m[1] * m[5] - m[2] * m[4]) * invDet
+            ],
+            [
+                (m[5] * m[6] - m[3] * m[8]) * invDet,
+                (m[0] * m[8] - m[2] * m[6]) * invDet,
+                (m[2] * m[3] - m[0] * m[5]) * invDet
+            ],
+            [
+                (m[3] * m[7] - m[4] * m[6]) * invDet,
+                (m[1] * m[6] - m[0] * m[7]) * invDet,
+                (m[0] * m[4] - m[1] * m[3]) * invDet
+            ]
+        ];
+    }
+
 	Util.prototype.rad = function(angle) {
 		return (angle * (Math.PI / 180));
 	}
-	
+
 	var instance = null;
-	
+
 	return {
 		getInstance: function() {
 			if(instance === null) {
@@ -165,7 +228,7 @@ var MyUtil = (function() {
 			return instance;
 		}
 	}
-	
+
 })();
 
 export {MyUtil}

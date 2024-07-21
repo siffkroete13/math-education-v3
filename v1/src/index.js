@@ -7,6 +7,7 @@ import { Events } from "./Events";
 import WebGLDebugUtils from "webgl-debug";
 import { LoadModel } from "./LoadModel";
 import { ModelUtil } from "./utils/ModelUtil";
+import { CoordinateSystem } from "/models/CoordSystem";
 
 let myUtil = MyUtil.getInstance();
 let modelUtil = ModelUtil.getInstance(myUtil);
@@ -15,13 +16,6 @@ let modelUtil = ModelUtil.getInstance(myUtil);
 async function start() {
     const canvas = document.querySelector("#meineWebGLCanvas");
     const gl = canvas.getContext("webgl");
-
-    const monitor = {};
-    monitor.mouse_x = document.getElementsByClassName("mouse_x")[0];
-    monitor.mouse_y = document.getElementsByClassName("mouse_y")[0];
-    monitor.angle_x = document.getElementsByClassName("angle_x")[0];
-    monitor.angle_y = document.getElementsByClassName("angle_y")[0];
-
     if (!gl) {
         alert(
             "Unable to initialize WebGL. Your browser or machine may not support it."
@@ -29,32 +23,36 @@ async function start() {
         return;
     }
 
+
+    const monitor = {};
+    monitor.mouse_x = document.getElementsByClassName("mouse_x")[0];
+    monitor.mouse_y = document.getElementsByClassName("mouse_y")[0];
+    monitor.angle_x = document.getElementsByClassName("angle_x")[0];
+    monitor.angle_y = document.getElementsByClassName("angle_y")[0];
+
+
     let [vShaderCode, fShaderCode, modelData] = await Promise.all([
         ShaderUtil.loadShaderSource("./shaders/vShaderCode.glsl"),
         ShaderUtil.loadShaderSource("./shaders/fShaderCode.glsl"),
-        new LoadModel().loadFromUrl("./models/koord_sys.json"),
+        new LoadModel().loadFromUrl("./models/coord_sys.json"),
         // new LoadModel().loadFromUrl('./models/pyramid.json')
     ]);
 
     // console.log('Vertex Shader Code:', vShaderCode);
 
-    let modelData2 = myUtil.clone(modelData);
+    let coordSystem = new CoordinateSystem(modelData, myUtil);
+    let coordSystem_2 = coordSystem.clone();
+
     let rotationMatrix = mat4.create();
 
     mat4.rotate(rotationMatrix, rotationMatrix, myUtil.rad(45), [0, 0, 1]);
 
-    // Ein zweites Koordinatensystem erstellen. Zuerst vom ersten kopieren, dann transformieren und beide schlussendlich zeichnen.
-    let axes_2 = modelData.axes;
-    let ticks_2 = modelData.ticks;
+    coordSystem_2.transformToBasis(rotationMatrix);
 
-    // Achsen etwas transformieren
-    axes_2 = modelUtil.transform(modelData.axes, rotationMatrix);
-    ticks_2 = modelUtil.transform(modelData.ticks, rotationMatrix);
+    // Beide Koordinatensysteme mergen da mein VOB Model ja alles in einem haben will.
+    let allModelData = CoordinateSystem.ChannelMergerNode(coordSystem, coordSystem_2);
 
-    modelData["axes_2"] = axes_2;
-    modelData["ticks_2"] = ticks_2;
-
-    let scene = new Scene(canvas, gl, modelData, vShaderCode, fShaderCode);
+    let scene = new Scene(canvas, gl, allModelData, vShaderCode, fShaderCode);
 
     let controls = ["my_start", "my_pause"];
 
@@ -105,9 +103,5 @@ async function start() {
 
 // Ein kleiner Hack damit die Start-Funktion erst aufgerufen wird, nachdem DOM geladen ist.
 (function r(f) {
-    /in/.test(document.readyState)
-        ? setTimeout(function () {
-              r(f);
-          }, 9)
-        : f();
+    /in/.test(document.readyState)? setTimeout(function () {r(f);}, 9): f();
 })(start);
